@@ -1,2 +1,3 @@
 sourcing/*.csv
 sourcing/signaux_*.md
+__pycache__/
