@@ -100,49 +100,20 @@ textarea { min-height: 190px; resize: vertical; line-height: 1.5; font-size: 13.
 .sheet-frame { position: relative; width: 100%; }
 .sheet-scaler { transform-origin: top left; width: 794px; }
 .sheet {
-  --fs: 11.5px;
+  --fs: 12px;
   width: 794px; height: 1123px; overflow: hidden; background: var(--paper); color: var(--paper-ink);
   box-shadow: 0 1px 2px rgba(10, 20, 35, .12), 0 12px 32px rgba(10, 20, 35, .14);
-  padding: 46px 52px 38px; display: flex; flex-direction: column; gap: 16px;
-  font-family: var(--f-body); font-size: var(--fs); line-height: 1.42; color-scheme: light;
+  padding: 64px 72px; font-family: Arial, Helvetica, sans-serif; font-size: var(--fs); line-height: 1.45; color-scheme: light;
 }
-.s-head { display: grid; grid-template-columns: 1fr auto; gap: 6px 20px; border-bottom: 2px solid var(--paper-ink); padding-bottom: 12px; }
-.s-kicker { font-family: var(--f-label); font-weight: 600; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--paper-accent); }
-.s-title { font-family: var(--f-display); font-weight: 600; font-size: 25px; line-height: 1.12; margin: 2px 0 0; text-wrap: balance; }
-.s-vendor { color: var(--paper-muted); font-size: 12px; margin-top: 2px; }
-.s-meta { text-align: right; font-family: var(--f-data); font-size: 10px; color: var(--paper-muted); line-height: 1.6; font-variant-numeric: tabular-nums; }
-.s-ask { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; background: var(--paper-band); padding: 9px 12px; margin-top: 6px; }
-.s-ask .k { font-family: var(--f-label); font-weight: 700; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--paper-muted); }
-.s-ask .v { font-weight: 600; font-size: calc(var(--fs) + 1px); }
-.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-label); font-weight: 700; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 9px; border-radius: 3px; white-space: nowrap; }
-.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.chip.ok { color: var(--ok); background: var(--ok-bg); }
-.chip.warn { color: var(--warn); background: var(--warn-bg); }
-.chip.bad { color: var(--bad); background: var(--bad-bg); }
-.chip.idle { color: var(--idle); background: var(--idle-bg); }
-.s-reco { grid-column: 1 / -1; font-size: calc(var(--fs) - .5px); color: var(--paper-muted); font-style: italic; margin: 0; }
-
-.s-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 26px; flex: 1 1 auto; align-content: start; }
-.sec { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.sec.wide { grid-column: 1 / -1; }
-.sec h2 { margin: 0; display: flex; align-items: baseline; gap: 8px; font-family: var(--f-label); font-weight: 700; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--paper-accent); border-bottom: 1px solid var(--paper-rule); padding-bottom: 4px; }
-.sec h2 .q { font-family: var(--f-body); font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--paper-muted); font-size: 10.5px; margin-left: auto; }
-.sec ul { margin: 0; padding-left: 14px; display: flex; flex-direction: column; gap: 3px; }
-.sec li::marker { color: var(--paper-accent); }
-.figure { font-family: var(--f-data); font-weight: 600; font-size: calc(var(--fs) + 6px); line-height: 1.15; color: var(--paper-ink); font-variant-numeric: tabular-nums; }
-.figure small { display: block; font-family: var(--f-label); font-weight: 500; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--paper-muted); margin-bottom: 1px; }
+.sheet h1 { font-size: calc(var(--fs) + 8px); font-weight: bold; margin: 0 0 1em; }
+.sheet h2 { font-size: calc(var(--fs) + 3px); font-weight: bold; margin: 1.3em 0 .4em; }
+.sheet h3 { font-size: var(--fs); font-weight: bold; margin: .7em 0 .2em; }
+.sheet p { margin: 0 0 .3em; }
+.sheet ul { margin: 0 0 .3em; padding-left: 1.4em; }
+.sheet li { margin: 0 0 .15em; }
 .placeholder { color: var(--paper-muted); font-style: italic; }
-table.steps { width: 100%; border-collapse: collapse; font-size: var(--fs); }
-table.steps th { text-align: left; font-family: var(--f-label); font-weight: 600; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--paper-muted); padding: 2px 8px 4px 0; }
-table.steps td { border-top: 1px solid var(--paper-rule); padding: 4px 8px 4px 0; vertical-align: top; }
-table.steps td.d { font-family: var(--f-data); font-size: calc(var(--fs) - 1px); white-space: nowrap; font-variant-numeric: tabular-nums; }
-table.steps td.o { white-space: nowrap; color: var(--paper-muted); }
-.s-open { background: var(--paper-band); padding: 8px 12px; }
-.s-open h2 { border: 0; padding: 0; }
-.s-foot { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--paper-rule); padding-top: 7px; font-family: var(--f-data); font-size: 9px; color: var(--paper-muted); }
-[contenteditable="true"] { border-radius: 2px; }
-[contenteditable="true"]:hover { background: rgba(29, 78, 137, .06); }
-[contenteditable="true"]:focus { outline: 1px dashed var(--paper-accent); outline-offset: 1px; background: rgba(29, 78, 137, .05); }
+[contenteditable="true"]:hover { background: rgba(0, 0, 0, .04); }
+[contenteditable="true"]:focus { outline: 1px dashed var(--paper-muted); outline-offset: 1px; }
 .sheet.exporting [contenteditable] { outline: none; background: transparent; }
 .overflow-warn { color: var(--danger); font-size: 12.5px; }
 @media (prefers-reduced-motion: no-preference) { .btn { transition: border-color .12s; } }
@@ -252,15 +223,6 @@ table.steps td.o { white-space: nowrap; color: var(--paper-muted); }
     points_ouverts: ["Coût des connecteurs bancaires au-delà de 3 banques", "Engagement de réversibilité des données en fin de contrat"]
   };
 
-  const SECTION_HINTS = {
-    contexte: "Context",
-    pourquoi_maintenant: "Why now?",
-    investissement: "Investment",
-    roi: "ROI",
-    conformite: "Compliance",
-    prochaines_etapes: "Next steps"
-  };
-
   // ---------- État ----------
   let db = null, sample = null, downloads = null;
   let mode = "loading"; // "db" | "local"
@@ -298,22 +260,13 @@ table.steps td.o { white-space: nowrap; color: var(--paper-muted); }
     };
   }
 
-  // ---------- Rendu de la feuille ----------
-  function chipClass(statut) {
-    const s = (statut || "").toLowerCase();
-    if (s.includes("no go") || s.includes("bloquant")) return "bad";
-    if (s.includes("condition") || s.includes("lever") || s.includes("réserve")) return "warn";
-    if (s.startsWith("go") || s === "ok" || s.includes("conforme")) return "ok";
-    return "idle";
-  }
+  // ---------- Rendu de la feuille (texte brut : titres et sous-titres) ----------
   const ph = (t) => `<span class="placeholder">${esc(t)}</span>`;
-  const ed = (path, val, fallback) => `<span contenteditable="true" spellcheck="false" data-path="${path}">${val ? esc(val) : ""}</span>${val ? "" : ph(fallback)}`;
+  const ce = (path, val) => `contenteditable="true" spellcheck="false" data-path="${path}">${esc(val)}`;
+  const line = (path, val, fallback) => val ? `<p ${ce(path, val)}</p>` : `<p>${ph(fallback)}</p>`;
   function bullets(path, list, emptyText) {
-    if (!list.length) return `<p style="margin:0">${ph(emptyText)}</p>`;
-    return `<ul>${list.map((b, i) => `<li contenteditable="true" spellcheck="false" data-path="${path}.${i}">${esc(b)}</li>`).join("")}</ul>`;
-  }
-  function figure(path, label, val) {
-    return `<div class="figure"><small>${esc(label)}</small><span contenteditable="true" spellcheck="false" data-path="${path}">${esc(val || "—")}</span></div>`;
+    if (!list.length) return emptyText ? `<p>${ph(emptyText)}</p>` : "";
+    return `<ul>${list.map((b, i) => `<li ${ce(path + "." + i, b)}</li>`).join("")}</ul>`;
   }
 
   function renderSheet() {
@@ -322,39 +275,35 @@ table.steps td.o { white-space: nowrap; color: var(--paper-muted); }
     $("example-banner").hidden = !isExample;
     const sheet = $("sheet");
     sheet.dataset.example = isExample ? "1" : "";
-    const updated = doc?.updatedAt ? frDate(new Date(doc.updatedAt).toISOString()) : frDate(todayISO());
-    const nMeet = isExample ? 3 : meetings.length;
+    const title = [s.logiciel, s.editeur].filter(Boolean).join(" – ");
     const steps = s.prochaines_etapes.length
-      ? `<table class="steps"><thead><tr><th>Action</th><th>Porteur</th><th>Échéance</th></tr></thead><tbody>${
-          s.prochaines_etapes.map((x, i) => `<tr><td contenteditable="true" spellcheck="false" data-path="prochaines_etapes.${i}.action">${esc(x.action)}</td><td class="o" contenteditable="true" spellcheck="false" data-path="prochaines_etapes.${i}.responsable">${esc(x.responsable)}</td><td class="d" contenteditable="true" spellcheck="false" data-path="prochaines_etapes.${i}.echeance">${esc(x.echeance)}</td></tr>`).join("")
-        }</tbody></table>`
-      : `<p style="margin:0">${ph("Aucune étape définie pour l'instant.")}</p>`;
+      ? `<ul>${s.prochaines_etapes.map((x, i) => `<li><span ${ce(`prochaines_etapes.${i}.action`, x.action)}</span> – <span ${ce(`prochaines_etapes.${i}.responsable`, x.responsable || "?")}</span> – <span ${ce(`prochaines_etapes.${i}.echeance`, x.echeance || "?")}</span></li>`).join("")}</ul>`
+      : `<p>${ph("Aucune étape définie pour l'instant.")}</p>`;
 
     sheet.innerHTML = `
-      <header class="s-head">
-        <div>
-          <div class="s-kicker">Note de décision · Achat logiciel</div>
-          <h1 class="s-title">${ed("logiciel", s.logiciel, "Logiciel à préciser")}</h1>
-          <div class="s-vendor">${ed("editeur", s.editeur, "Éditeur à préciser")}</div>
-        </div>
-        <div class="s-meta">Mis à jour le ${esc(updated)}<br>${nMeet} réunion${nMeet > 1 ? "s" : ""} analysée${nMeet > 1 ? "s" : ""}<br>Confidentiel</div>
-        <div class="s-ask">
-          <span class="k">Décision demandée</span>
-          <span class="v">${ed("decision", s.decision, "À formuler")}</span>
-          <span class="chip ${chipClass(s.recommandation.statut)}">${esc(s.recommandation.statut)}</span>
-        </div>
-        ${s.recommandation.justification ? `<p class="s-reco" contenteditable="true" spellcheck="false" data-path="recommandation.justification">${esc(s.recommandation.justification)}</p>` : ""}
-      </header>
-      <div class="s-grid">
-        <section class="sec"><h2>Contexte <span class="q">${SECTION_HINTS.contexte}</span></h2>${bullets("contexte", s.contexte, "Situation actuelle, périmètre, irritants.")}</section>
-        <section class="sec"><h2>Pourquoi maintenant ? <span class="q">${SECTION_HINTS.pourquoi_maintenant}</span></h2>${bullets("pourquoi_maintenant", s.pourquoi_maintenant, "Échéances, risques, opportunités qui imposent de décider.")}</section>
-        <section class="sec"><h2>Investissement <span class="q">${SECTION_HINTS.investissement}</span></h2>${figure("investissement.chiffre_cle", "Coût total", s.investissement.chiffre_cle)}${bullets("investissement.points", s.investissement.points, "Licences, intégration, coûts internes.")}</section>
-        <section class="sec"><h2>ROI <span class="q">${SECTION_HINTS.roi}</span></h2>${figure("roi.chiffre_cle", "Retour attendu", s.roi.chiffre_cle)}${bullets("roi.points", s.roi.points, "Gains chiffrés, délai de retour sur investissement.")}</section>
-        <section class="sec"><h2>Conformité <span class="q">${SECTION_HINTS.conformite}</span></h2><div><span class="chip ${chipClass(s.conformite.statut)}">${esc(s.conformite.statut)}</span></div>${bullets("conformite.points", s.conformite.points, "RGPD, sécurité, hébergement, contrat.")}</section>
-        <section class="sec"><h2>Prochaines étapes <span class="q">${SECTION_HINTS.prochaines_etapes}</span></h2>${steps}</section>
-        ${s.points_ouverts.length ? `<section class="sec wide s-open"><h2>Points ouverts</h2>${bullets("points_ouverts", s.points_ouverts, "")}</section>` : ""}
-      </div>
-      <footer class="s-foot"><span>Synthèse générée à partir des notes de réunion · à valider par le porteur du dossier</span><span>${esc(doc?.nom || "Exemple")}</span></footer>`;
+      <h1>${title ? esc(title) : ph("Logiciel à préciser")}</h1>
+      <h3>Décision demandée</h3>
+      ${line("decision", s.decision, "À formuler")}
+      <h3>Recommandation</h3>
+      <p>${esc(s.recommandation.statut)}${s.recommandation.justification ? ` – <span ${ce("recommandation.justification", s.recommandation.justification)}</span>` : ""}</p>
+      <h2>Context</h2>
+      ${bullets("contexte", s.contexte, "Situation actuelle, périmètre, irritants.")}
+      <h2>Why now?</h2>
+      ${bullets("pourquoi_maintenant", s.pourquoi_maintenant, "Échéances, risques, opportunités qui imposent de décider.")}
+      <h2>Investment</h2>
+      <h3>Coût total</h3>
+      ${line("investissement.chiffre_cle", s.investissement.chiffre_cle, "À chiffrer")}
+      ${s.investissement.points.length ? `<h3>Détail</h3>${bullets("investissement.points", s.investissement.points, "")}` : ""}
+      <h2>ROI</h2>
+      <h3>Retour attendu</h3>
+      ${line("roi.chiffre_cle", s.roi.chiffre_cle, "À chiffrer")}
+      ${s.roi.points.length ? `<h3>Détail</h3>${bullets("roi.points", s.roi.points, "")}` : ""}
+      <h2>Compliance</h2>
+      <h3>Statut : ${esc(s.conformite.statut)}</h3>
+      ${bullets("conformite.points", s.conformite.points, "RGPD, sécurité, hébergement, contrat.")}
+      <h2>Next steps</h2>
+      ${steps}
+      ${s.points_ouverts.length ? `<h3>Points ouverts</h3>${bullets("points_ouverts", s.points_ouverts, "")}` : ""}`;
     fitSheet();
     scaleSheet();
   }
@@ -367,7 +316,7 @@ table.steps td.o { white-space: nowrap; color: var(--paper-muted); }
   // Réduit la taille du texte jusqu'à ce que tout tienne sur la page A4
   function fitSheet() {
     const sheet = $("sheet");
-    let fs = 11.5;
+    let fs = 12;
     sheet.style.setProperty("--fs", fs + "px");
     while (sheet.scrollHeight > sheet.clientHeight + 1 && fs > 8.5) {
       fs -= 0.25;
@@ -637,11 +586,20 @@ ${newMeetings.map((m) => `--- Réunion du ${frDate(m.date)}${m.titre ? " · " + 
   // ---------- Exports ----------
   function plainText() {
     const s = $("sheet").dataset.example ? EXAMPLE : normalize(doc.state);
-    const L = (t, arr) => arr.length ? `\n${t}\n` + arr.map((x) => "• " + x).join("\n") + "\n" : "";
-    return `${s.logiciel}${s.editeur ? " — " + s.editeur : ""}
-Décision demandée : ${s.decision}
-Recommandation : ${s.recommandation.statut}${s.recommandation.justification ? " — " + s.recommandation.justification : ""}
-${L("CONTEXTE", s.contexte)}${L("POURQUOI MAINTENANT ?", s.pourquoi_maintenant)}${L("INVESTISSEMENT — " + (s.investissement.chiffre_cle || "à chiffrer"), s.investissement.points)}${L("ROI — " + (s.roi.chiffre_cle || "à chiffrer"), s.roi.points)}${L("CONFORMITÉ — " + s.conformite.statut, s.conformite.points)}${L("PROCHAINES ÉTAPES", s.prochaines_etapes.map((x) => `${x.action} (${x.responsable || "?"}, ${x.echeance || "?"})`))}${L("POINTS OUVERTS", s.points_ouverts)}`.trim();
+    const L = (arr) => arr.map((x) => "- " + x).join("\n");
+    const parts = [
+      [s.logiciel, s.editeur].filter(Boolean).join(" – "),
+      "Décision demandée\n" + s.decision,
+      "Recommandation\n" + s.recommandation.statut + (s.recommandation.justification ? " – " + s.recommandation.justification : ""),
+      "CONTEXT\n" + L(s.contexte),
+      "WHY NOW?\n" + L(s.pourquoi_maintenant),
+      "INVESTMENT\nCoût total : " + (s.investissement.chiffre_cle || "à chiffrer") + (s.investissement.points.length ? "\n" + L(s.investissement.points) : ""),
+      "ROI\nRetour attendu : " + (s.roi.chiffre_cle || "à chiffrer") + (s.roi.points.length ? "\n" + L(s.roi.points) : ""),
+      "COMPLIANCE\nStatut : " + s.conformite.statut + (s.conformite.points.length ? "\n" + L(s.conformite.points) : ""),
+      "NEXT STEPS\n" + L(s.prochaines_etapes.map((x) => `${x.action} – ${x.responsable || "?"} – ${x.echeance || "?"}`)) +
+        (s.points_ouverts.length ? "\n\nPoints ouverts\n" + L(s.points_ouverts) : "")
+    ];
+    return parts.join("\n\n").trim();
   }
   $("copy-btn").addEventListener("click", async () => {
     const txt = plainText();
