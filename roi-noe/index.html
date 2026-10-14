@@ -106,8 +106,17 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   <form class="card" id="f" autocomplete="off" novalidate>
     <div class="q">
-      <label for="cers">Nombre de CER par an<small>Nouveaux CER et mises à jour.</small></label>
-      <div class="input"><input id="cers" type="number" min="0" step="1" value="10"><i>CER</i></div>
+      <span class="lbl" id="cersLbl">Nombre de CER par an<small>Nouveaux CER et mises à jour.</small></span>
+      <div class="seg cols-4" id="cersSeg" role="group" aria-labelledby="cersLbl">
+        <button type="button" data-cers="1">1</button>
+        <button type="button" data-cers="2">2</button>
+        <button type="button" data-cers="5">5</button>
+        <button type="button" data-cers="10" aria-pressed="true">10</button>
+        <button type="button" data-cers="15">15</button>
+        <button type="button" data-cers="20">20</button>
+        <button type="button" data-cers="30">30</button>
+        <button type="button" data-cers="50">50</button>
+      </div>
     </div>
     <div class="q">
       <span class="lbl" id="weeksLbl">Durée d'un CER<small>Temps de travail passé sur un CER aujourd'hui, en semaines.</small></span>
@@ -172,7 +181,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 (function () {
   "use strict";
   var WORK_DAYS = 218;
-  var gain = 70, cost = 80000, weeks = 6, view = "temps";
+  var gain = 70, cost = 80000, weeks = 6, cers = 10, view = "temps";
   var LEDE = {
     temps: "Pour les experts métier : trois questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos rapports d'évaluation clinique.",
     argent: "Pour les décideurs : quatre questions pour estimer le temps et le budget que Noé libère sur vos rapports d'évaluation clinique."
@@ -180,10 +189,9 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   var $ = function (id) { return document.getElementById(id); };
   var nf0 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
   var nf1 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
-  var num = function (id) { var n = parseFloat($(id).value); return isFinite(n) && n > 0 ? n : 0; };
 
   function render() {
-    var cers = num("cers"), days = weeks * 5;
+    var days = weeks * 5;
     var after = days * (1 - gain / 100);
     var saved = cers * days * gain / 100;
     var eur = saved * cost / WORK_DAYS;
@@ -210,6 +218,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     });
   }
   choice("gainSeg", function (b) { gain = +b.dataset.gain; });
+  choice("cersSeg", function (b) { cers = +b.dataset.cers; });
   choice("weeksSeg", function (b) { weeks = +b.dataset.weeks; });
   choice("costSeg", function (b) { cost = +b.dataset.cost; });
 
