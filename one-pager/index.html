@@ -208,19 +208,19 @@ textarea { min-height: 190px; resize: vertical; line-height: 1.5; font-size: 13.
 
   const EXAMPLE = {
     logiciel: "Logiciel de gestion des notes de frais", editeur: "Éditeur SaaS « Exemplo »",
-    decision: "Valider le contrat 3 ans et le lancement du pilote au T1",
-    recommandation: { statut: "GO sous conditions", justification: "ROI solide ; signature conditionnée à la levée du point d'hébergement des données." },
-    contexte: ["1 200 collaborateurs, 9 000 notes de frais/an traitées sur Excel et papier", "3 ETP comptables mobilisés sur la saisie et le contrôle", "Outil actuel non maintenu depuis 2022"],
-    pourquoi_maintenant: ["Fin du support de l'outil actuel au 30/06", "Facturation électronique obligatoire : chantier finance déjà ouvert", "Remise éditeur de 15 % si signature avant le 15/12"],
-    investissement: { chiffre_cle: "168 k€ sur 3 ans", points: ["Licences : 48 k€/an (1 200 users × 3,30 €/mois)", "Intégration ERP et paramétrage : 24 k€ one-shot", "Interne : 40 jours DSI + 20 jours finance"] },
-    roi: { chiffre_cle: "Payback 14 mois", points: ["Gain : 1,8 ETP réaffecté au contrôle de gestion (≈ 110 k€/an)", "Délai de remboursement : 21 j → 5 j", "Réduction des fraudes et erreurs estimée à 0,5 % du volume (à confirmer)"] },
-    conformite: { statut: "Points à lever", points: ["RGPD : DPA signé, sous-traitants listés", "Hébergement UE confirmé ; sauvegardes hors UE à clarifier", "SSO / SAML disponible, audit pentest 2025 fourni"] },
+    decision: "Signer un contrat de 3 ans et lancer un test début 2027.",
+    recommandation: { statut: "GO sous conditions", justification: "Le projet est rentable. On signe une fois la question des sauvegardes réglée." },
+    contexte: ["Nous traitons 9 000 notes de frais par an, sur Excel et papier.", "Trois comptables y passent une grande partie de leur temps.", "Notre outil actuel n'est plus mis à jour depuis 2022."],
+    pourquoi_maintenant: ["Notre outil actuel s'arrête le 30 juin.", "La facture électronique devient obligatoire : la finance est déjà en chantier.", "L'éditeur nous fait 15 % de remise si on signe avant le 15 décembre."],
+    investissement: { chiffre_cle: "168 000 € sur 3 ans.", points: ["Abonnement : 48 000 € par an pour 1 200 personnes.", "Mise en place et lien avec notre outil comptable : 24 000 €, payés une fois.", "Temps interne : 40 jours pour l'informatique, 20 jours pour la finance."] },
+    roi: { chiffre_cle: "L'investissement est remboursé en 14 mois.", points: ["Près de deux postes comptables passent sur des tâches utiles (environ 110 000 € par an).", "Les salariés sont remboursés en 5 jours au lieu de 21.", "Moins d'erreurs et de fraudes : environ 0,5 % du montant total (à confirmer)."] },
+    conformite: { statut: "Points à lever", points: ["Le contrat sur les données personnelles est signé.", "Les données sont stockées en Europe. Les sauvegardes, on ne sait pas encore.", "La connexion avec nos identifiants d'entreprise fonctionne. Un test de sécurité récent est fourni."] },
     prochaines_etapes: [
-      { action: "Réponse écrite sur la localisation des sauvegardes", responsable: "Éditeur", echeance: "25/11" },
-      { action: "Revue juridique du contrat", responsable: "Juridique", echeance: "02/12" },
-      { action: "Comité de décision", responsable: "DAF", echeance: "10/12" }
+      { action: "Confirmer par écrit où sont stockées les sauvegardes", responsable: "Éditeur", echeance: "25/11" },
+      { action: "Relire le contrat", responsable: "Juridique", echeance: "02/12" },
+      { action: "Présenter la décision en comité", responsable: "DAF", echeance: "10/12" }
     ],
-    points_ouverts: ["Coût des connecteurs bancaires au-delà de 3 banques", "Engagement de réversibilité des données en fin de contrat"]
+    points_ouverts: ["Combien coûte le lien avec plus de trois banques ?", "Pourrons-nous récupérer toutes nos données en fin de contrat ?"]
   };
 
   // ---------- État ----------
@@ -456,10 +456,12 @@ Règles de fusion :
 - Conserve tout ce qui reste valable dans l'état actuel, y compris les formulations corrigées à la main.
 - Une information plus récente remplace l'ancienne si elle la contredit (dates, montants, statuts). Les réunions sont données dans l'ordre chronologique.
 - N'invente aucun chiffre, nom ou date. Si une donnée est estimée ou non vérifiée, ajoute « (à confirmer) ».
-- Écris en français, style télégraphique de dirigeant : chaque puce ≤ 20 mots, chiffres précis avec unités (k€, ETP, mois, %).
-- Maximum 4 puces par section, 4 prochaines étapes, 3 points ouverts. Supprime les étapes réalisées.
+- Style : écris en français avec des phrases simples, courtes et directes (sujet, verbe, complément). Une idée par phrase, 15 mots maximum. Voix active, ton dynamique.
+- Pas de jargon ni d'anglicismes : pas de sigles techniques (ETP, SSO, DPA, SaaS, TCO, payback…) ni de mots comme « one-shot », « scope », « use case ». Dis-le en mots simples (« deux postes », « remboursé en 14 mois »). Un dirigeant non spécialiste doit tout comprendre en une lecture.
+- Chiffres précis avec leur unité en clair (€, jours, mois, %), écrits comme on les dirait : « 48 000 € par an ».
+- Maximum 4 phrases par section, 4 prochaines étapes, 3 points ouverts. Supprime les étapes réalisées.
 - contexte = situation actuelle, périmètre, douleur. pourquoi_maintenant = échéances, coûts de l'inaction, fenêtres d'opportunité.
-- investissement.chiffre_cle = coût total sur la durée (ex. « 168 k€ sur 3 ans »). roi.chiffre_cle = indicateur clé (payback, gain annuel, TRI).
+- investissement.chiffre_cle = coût total sur la durée, en une phrase (ex. « 168 000 € sur 3 ans. »). roi.chiffre_cle = le gain principal en une phrase (ex. « L'investissement est remboursé en 14 mois. »).
 - conformite = RGPD, sécurité, hébergement, réversibilité, contrat. conformite.statut ∈ « OK », « Points à lever », « Bloquant », « Non évalué ».
 - recommandation.statut ∈ « GO », « GO sous conditions », « NO GO », « À instruire » ; justification en une phrase.
 - decision = la décision précise attendue du comité, en une phrase à l'infinitif.
