@@ -68,11 +68,9 @@ h1 em { color: var(--accent); }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-.tabs button { font: 600 15px var(--font-body); text-align: left; background: var(--surface); color: var(--muted); border: 0; padding: 14px 18px; cursor: pointer; box-shadow: inset 0 -3px 0 transparent; }
-.tabs button small { display: block; font: 400 13px var(--font-body); }
-.tabs button[aria-selected="true"] { color: var(--ink); box-shadow: inset 0 -3px 0 var(--accent); }
-.tabs button[aria-selected="true"] small { color: var(--accent); }
+.tabs { display: inline-flex; justify-self: start; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; }
+.tabs button { font: 500 13px var(--font-body); background: transparent; color: var(--muted); border: 0; border-radius: 999px; padding: 5px 14px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--accent); color: var(--surface); }
 .result { display: grid; gap: 18px; }
 .big { background: var(--accent-soft); border-radius: 6px; padding: 22px; display: grid; gap: 4px; }
 .big .k { font: 500 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -102,8 +100,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   </header>
 
   <div class="tabs" role="tablist" aria-label="Type de calcul">
-    <button type="button" role="tab" id="tab-temps" data-view="temps" aria-controls="f">Gain de temps<small>Pour les experts métier</small></button>
-    <button type="button" role="tab" id="tab-argent" data-view="argent" aria-controls="f">Temps et argent<small>Pour les décideurs</small></button>
+    <button type="button" role="tab" id="tab-temps" data-view="temps" aria-controls="f">Gain de temps</button>
+    <button type="button" role="tab" id="tab-argent" data-view="argent" aria-controls="f">Temps et argent</button>
   </div>
 
   <form class="card" id="f" autocomplete="off" novalidate>
@@ -176,8 +174,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   var WORK_DAYS = 218;
   var gain = 70, cost = 80000, weeks = 6, view = "temps";
   var LEDE = {
-    temps: "Trois questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos rapports d'évaluation clinique.",
-    argent: "Quatre questions pour estimer le temps et le budget que Noé libère sur vos rapports d'évaluation clinique."
+    temps: "Pour les experts métier : trois questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos rapports d'évaluation clinique.",
+    argent: "Pour les décideurs : quatre questions pour estimer le temps et le budget que Noé libère sur vos rapports d'évaluation clinique."
   };
   var $ = function (id) { return document.getElementById(id); };
   var nf0 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
