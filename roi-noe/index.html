@@ -80,6 +80,8 @@ legend + * { clear: both; }
 .input:focus-within { border-color: var(--accent); }
 .input input { width: 100%; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 500 14px var(--font-mono); padding: 7px 8px; text-align: right; font-variant-numeric: tabular-nums; }
 .input input:focus-visible { outline: none; }
+.input select { width: 100%; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 500 13px var(--font-mono); padding: 7px 6px; cursor: pointer; }
+.input select:focus-visible { outline: none; }
 .input i { font: 12px var(--font-mono); font-style: normal; color: var(--muted); padding-right: 8px; white-space: nowrap; }
 .range { display: grid; grid-template-columns: minmax(0, 1fr) 52px; gap: 2px 12px; align-items: center; }
 .range label { font-size: 14px; grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 8px; }
@@ -185,9 +187,18 @@ tfoot td:first-child { font-family: var(--font-body); }
           <small>Nouveaux REC et mises à jour (annuelles pour classe III et implantables).</small>
         </div>
         <div class="field">
-          <label for="rate">Coût horaire chargé</label>
-          <div class="input"><input id="rate" type="number" min="0" step="5"><i>€/h</i></div>
-          <small>Coût interne chargé, ou taux journalier du consultant ÷ 7.</small>
+          <label for="salary">Salaire d'un responsable des évaluations cliniques</label>
+          <div class="input"><select id="salary">
+            <option value="35000">30 – 40 k€</option>
+            <option value="45000">40 – 50 k€</option>
+            <option value="55000">50 – 60 k€</option>
+            <option value="65000">60 – 70 k€</option>
+            <option value="75000">70 – 80 k€</option>
+            <option value="85000">80 – 90 k€</option>
+            <option value="95000">90 – 100 k€</option>
+            <option value="110000">Plus de 100 k€</option>
+          </select></div>
+          <small id="rateHelp">Salaire brut annuel.</small>
         </div>
       </fieldset>
 
@@ -297,7 +308,7 @@ tfoot td:first-child { font-family: var(--font-body); }
 
       <section>
         <h2>Projection sur 3 ans</h2>
-        <p class="sub">Gains = heures économisées × coût horaire. Le coût de mise en place est imputé à l'année 1.</p>
+        <p class="sub">Gains = heures économisées × coût horaire chargé. Le coût de mise en place est imputé à l'année 1.</p>
         <div class="panel table-wrap">
           <table>
             <thead><tr><th>Année</th><th>Heures économisées</th><th>Gains</th><th>Coût Noé</th><th>Gain net</th><th>Cumul</th></tr></thead>
@@ -321,7 +332,7 @@ tfoot td:first-child { font-family: var(--font-body); }
       <section class="method">
         <h2>Méthode</h2>
         <p><strong>Temps actuel par REC</strong> = protocole + (références × temps par résumé × relecteurs) + (textes intégraux × temps par texte) + rédaction.</p>
-        <p><strong>Temps avec Noé</strong> = chaque étape × (1 − gain de l'étape). Les heures libérées sont valorisées au coût horaire chargé. Un ETP compte 1 607 h par an.</p>
+        <p><strong>Temps avec Noé</strong> = chaque étape × (1 − gain de l'étape). Les heures libérées sont valorisées au coût horaire chargé d'un responsable des évaluations cliniques : milieu de la tranche de salaire brut × 1,45 (charges patronales) ÷ 1 607 h (un ETP).</p>
         <p><strong>ROI</strong> = (gains − coûts Noé) ÷ coûts Noé. Les profils types et les gains par défaut sont des hypothèses d'illustration, pas des mesures de performance : ajustez-les avec vos propres données.</p>
       </section>
     </div>
@@ -332,14 +343,15 @@ tfoot td:first-child { font-family: var(--font-body); }
 (function () {
   "use strict";
   var PRESETS = {
-    pme:     { cers: 6,  rate: 70,  hProto: 12, nAbs: 800,  tAbs: 1.5, dbl: false, nFt: 60,  tFt: 45, hWrite: 32, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 15000, setup: 3000,  adopt: 80, weekHours: 20 },
-    eti:     { cers: 20, rate: 80,  hProto: 16, nAbs: 1500, tAbs: 1.5, dbl: false, nFt: 120, tFt: 45, hWrite: 40, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 30000, setup: 5000,  adopt: 80, weekHours: 25 },
-    groupe:  { cers: 60, rate: 90,  hProto: 20, nAbs: 2500, tAbs: 1.5, dbl: true,  nFt: 200, tFt: 50, hWrite: 48, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 75000, setup: 12000, adopt: 70, weekHours: 30 },
-    conseil: { cers: 40, rate: 110, hProto: 14, nAbs: 1500, tAbs: 1.2, dbl: false, nFt: 120, tFt: 40, hWrite: 36, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 45000, setup: 6000,  adopt: 80, weekHours: 35 }
+    pme:     { cers: 6,  salary: 45000, hProto: 12, nAbs: 800,  tAbs: 1.5, dbl: false, nFt: 60,  tFt: 45, hWrite: 32, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 15000, setup: 3000,  adopt: 80, weekHours: 20 },
+    eti:     { cers: 20, salary: 55000, hProto: 16, nAbs: 1500, tAbs: 1.5, dbl: false, nFt: 120, tFt: 45, hWrite: 40, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 30000, setup: 5000,  adopt: 80, weekHours: 25 },
+    groupe:  { cers: 60, salary: 65000, hProto: 20, nAbs: 2500, tAbs: 1.5, dbl: true,  nFt: 200, tFt: 50, hWrite: 48, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 75000, setup: 12000, adopt: 70, weekHours: 30 },
+    conseil: { cers: 40, salary: 55000, hProto: 14, nAbs: 1500, tAbs: 1.2, dbl: false, nFt: 120, tFt: 40, hWrite: 36, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 45000, setup: 6000,  adopt: 80, weekHours: 35 }
   };
   var KEYS = Object.keys(PRESETS.eti);
   var FTE_HOURS = 1607;
-  var STORE = "noe-roi-v1";
+  var EMPLOYER_COST = 1.45; // charges patronales ≈ 45 % du brut
+  var STORE = "noe-roi-v2";
   var preset = "eti", basePreset = "eti";
 
   var $ = function (id) { return document.getElementById(id); };
@@ -371,6 +383,8 @@ tfoot td:first-child { font-family: var(--font-body); }
       v[k] = isFinite(n) && n >= 0 ? n : 0;
     });
     v.adopt = Math.min(v.adopt, 100);
+    v.rate = v.salary * EMPLOYER_COST / FTE_HOURS;
+    v.band = $("salary").selectedOptions[0] ? $("salary").selectedOptions[0].textContent : "";
     v.weekHours = Math.max(v.weekHours, 1);
     return v;
   }
@@ -421,6 +435,7 @@ tfoot td:first-child { font-family: var(--font-body); }
   function render() {
     var v = readValues();
     var r = compute(v);
+    $("rateHelp").textContent = "Salaire brut annuel. Soit environ " + eur(v.rate) + " de l'heure chargée (milieu de tranche × 1,45 ÷ 1 607 h).";
     ["rProto", "rAbs", "rFt", "rWrite"].forEach(function (k) { $("o_" + k).textContent = "−" + v[k] + " %"; });
 
     var roi3 = $("k_roi3");
@@ -468,7 +483,7 @@ tfoot td:first-child { font-family: var(--font-body); }
     $("summary").value = [
       "ROI de Noé pour la revue de littérature des REC (MDR 2017/745)",
       "",
-      "Hypothèses : " + nf0.format(v.cers) + " REC/an, " + nf0.format(v.nAbs) + " références triées et " + nf0.format(v.nFt) + " textes intégraux évalués par REC, coût horaire " + eur(v.rate) + ".",
+      "Hypothèses : " + nf0.format(v.cers) + " REC/an, " + nf0.format(v.nAbs) + " références triées et " + nf0.format(v.nFt) + " textes intégraux évalués par REC, salaire responsable des évaluations cliniques " + v.band + " brut/an (≈ " + eur(v.rate) + "/h chargé).",
       "Gains Noé retenus : protocole −" + v.rProto + " %, tri −" + v.rAbs + " %, évaluation/extraction −" + v.rFt + " %, rédaction −" + v.rWrite + " %.",
       "",
       "• Temps par REC : " + h(r.before) + " → " + h(r.after) + " (" + signed(-r.savedPerCer, h) + ")",
