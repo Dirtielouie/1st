@@ -102,7 +102,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Noé · Revue de littérature des CER</div>
+    <div class="eyebrow">Noé · Revue de littérature des SOTA</div>
     <h1>Combien vous fait gagner <em>Noé</em> ?</h1>
     <p class="lede" id="lede"></p>
   </header>
@@ -114,7 +114,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   <form class="card" id="f" autocomplete="off" novalidate>
     <div class="q">
-      <span class="lbl" id="cersLbl">Nombre de CER par an<small>Nouveaux CER et mises à jour.</small></span>
+      <span class="lbl" id="cersLbl">Nombre de SOTA par an<small>Nouveaux SOTA et mises à jour.</small></span>
       <div class="seg cols-4" id="cersSeg" role="group" aria-labelledby="cersLbl">
         <button type="button" data-cers="1">1</button>
         <button type="button" data-cers="2">2</button>
@@ -127,7 +127,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       </div>
     </div>
     <div class="q">
-      <span class="lbl" id="weeksLbl">Durée d'un CER<small>Temps de travail passé sur un CER aujourd'hui, en semaines.</small></span>
+      <span class="lbl" id="weeksLbl">Durée d'un SOTA<small>Temps de travail passé sur un SOTA aujourd'hui, en semaines.</small></span>
       <div class="seg cols-4" id="weeksSeg" role="group" aria-labelledby="weeksLbl">
         <button type="button" data-weeks="1">1</button>
         <button type="button" data-weeks="2">2</button>
@@ -140,7 +140,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       </div>
     </div>
     <div class="q">
-      <span class="lbl" id="teamLbl">Nombre de personnes dans l'équipe<small>Personnes qui travaillent sur un CER.</small></span>
+      <span class="lbl" id="teamLbl">Nombre de personnes dans l'équipe<small>Personnes qui travaillent sur un SOTA.</small></span>
       <div class="seg cols-4" id="teamSeg" role="group" aria-labelledby="teamLbl">
         <button type="button" data-team="1" aria-pressed="true">1</button>
         <button type="button" data-team="2">2</button>
@@ -181,12 +181,12 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <span class="s" id="r_weeks_s"></span>
     </div>
     <div class="tiles">
-      <div class="tile" data-for="temps"><span class="k">CER en plus à effort égal</span><span class="v" id="r_more"></span></div>
+      <div class="tile" data-for="temps"><span class="k">SOTA en plus à effort égal</span><span class="v" id="r_more"></span></div>
       <div class="tile" data-for="argent"><span class="k">Semaines libérées par an</span><span class="v" id="r_weeks2"></span><span class="s" id="r_weeks2_s"></span></div>
       <div class="tile"><span class="k">Équivalent temps plein</span><span class="v" id="r_fte"></span></div>
     </div>
     <div class="card compare">
-      <h2>Durée d'un CER</h2>
+      <h2>Durée d'un SOTA</h2>
       <div class="bar"><span>Aujourd'hui</span><div><div class="fill" id="b_before"></div></div><b id="r_before"></b></div>
       <div class="bar after"><span>Avec Noé</span><div><div class="fill" id="b_after"></div></div><b id="r_after"></b></div>
     </div>
@@ -198,7 +198,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <span class="status" id="copyStatus" role="status"></span>
       </div>
     </div>
-    <p class="note">Calcul : CER par an × durée d'un CER × personnes dans l'équipe (1 semaine = 5 jours, 1 jour = 7 heures) × % économisé = jours libérés. Un salarié travaille 218 jours par an<span data-for="argent">, donc 1 jour = salaire brut chargé ÷ 218</span>.</p>
+    <p class="note">Calcul : SOTA par an × durée d'un SOTA × personnes dans l'équipe (1 semaine = 5 jours, 1 jour = 7 heures) × % économisé = jours libérés. Un salarié travaille 218 jours par an<span data-for="argent">, donc 1 jour = salaire brut chargé ÷ 218</span>.</p>
   </div>
 </div>
 
@@ -208,8 +208,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   var WORK_DAYS = 218, HOURS_PER_DAY = 7;
   var gain = 60, cost = 80000, weeks = 6, team = 1, cers = 4, view = "temps";
   var LEDE = {
-    temps: "Pour les experts métier : trois questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos rapports d'évaluation clinique.",
-    argent: "Pour les décideurs : quatre questions pour estimer le temps et le budget que Noé libère sur vos rapports d'évaluation clinique."
+    temps: "Pour les experts métier : trois questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos SOTA (états de l'art).",
+    argent: "Pour les décideurs : quatre questions pour estimer le temps et le budget que Noé libère sur vos SOTA (états de l'art)."
   };
   var $ = function (id) { return document.getElementById(id); };
   var nf0 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
@@ -238,11 +238,11 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
     var more = after > 0 ? Math.floor(cers * days / after - cers) : 0;
     var plural = function (n, one, many) { return n >= 2 ? many : one; };
-    var text = "Pour " + cers + " " + plural(cers, "CER", "CER") + " par an, dont la durée de travail est de " + weeks + " " + plural(weeks, "semaine", "semaines") +
+    var text = "Pour " + cers + " " + plural(cers, "SOTA", "SOTA") + " par an, dont la durée de travail est de " + weeks + " " + plural(weeks, "semaine", "semaines") +
       (cers > 1 ? " chacun" : "") + (team > 1 ? ", avec une équipe de " + team + " personnes" : ", avec 1 personne") + ", Noé vous fera économiser " + nf1.format(saved / 5) + " " + plural(saved / 5, "semaine", "semaines") + " de travail par an, soit " + gain + " % du temps passé (" +
       nf1.format(saved) + " " + plural(saved, "jour", "jours") + ", ou " + nf0.format(Math.round(saved * HOURS_PER_DAY)) + " heures). Cela représente " +
-      fte(saved / WORK_DAYS) + " ETP. Chaque CER passe de " + weeks + " à " + nf1.format(after / 5) + " " + plural(after / 5, "semaine", "semaines") + " de travail";
-    text += more > 0 ? ", ce qui permet de réaliser " + more + " " + plural(more, "CER", "CER") + " de plus à effort égal." : ".";
+      fte(saved / WORK_DAYS) + " ETP. Chaque SOTA passe de " + weeks + " à " + nf1.format(after / 5) + " " + plural(after / 5, "semaine", "semaines") + " de travail";
+    text += more > 0 ? ", ce qui permet de réaliser " + more + " " + plural(more, "SOTA", "SOTA") + " de plus à effort égal." : ".";
     if (view === "argent") {
       text += " Avec un salaire brut chargé de " + nf0.format(cost / 1000) + " k€, ce temps libéré représente une économie de " +
         nf0.format(Math.round(eur)) + " € par an, soit " + nf0.format(Math.round(eur * 3)) + " € sur 3 ans.";
