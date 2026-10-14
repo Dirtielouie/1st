@@ -119,11 +119,19 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <button type="button" data-cers="1">1</button>
         <button type="button" data-cers="2">2</button>
         <button type="button" data-cers="3">3</button>
-        <button type="button" data-cers="4" aria-pressed="true">4</button>
+        <button type="button" data-cers="4">4</button>
         <button type="button" data-cers="5">5</button>
         <button type="button" data-cers="6">6</button>
         <button type="button" data-cers="7">7</button>
         <button type="button" data-cers="8">8</button>
+        <button type="button" data-cers="9">9</button>
+        <button type="button" data-cers="10">10</button>
+        <button type="button" data-cers="11">11</button>
+        <button type="button" data-cers="12">12</button>
+        <button type="button" data-cers="13">13</button>
+        <button type="button" data-cers="14">14</button>
+        <button type="button" data-cers="15" aria-pressed="true">15</button>
+        <button type="button" data-cers="16">16</button>
       </div>
     </div>
     <div class="q">
@@ -193,7 +201,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 (function () {
   "use strict";
   var WORK_DAYS = 218, HOURS_PER_DAY = 7;
-  var gain = 60, cost = 80000, weeks = 6, cers = 4, view = "temps";
+  var gain = 60, cost = 80000, weeks = 6, cers = 15, view = "temps";
   var LEDE = {
     temps: "Pour les experts métier : deux questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos SOTA (états de l'art).",
     argent: "Pour les décideurs : trois questions pour estimer le temps et le budget que Noé libère sur vos SOTA (états de l'art)."
