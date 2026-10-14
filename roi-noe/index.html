@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout : une colonne étroite — titre, 4 questions, puis le résultat. */
+/* Layout : une colonne étroite — titre, 2 à 3 questions, puis le résultat. */
 :root {
   --paper: #F4F6F5;
   --surface: #FFFFFF;
@@ -95,6 +95,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pitch .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .btn { font: 500 14px var(--font-body); background: var(--accent); color: var(--surface); border: 0; border-radius: 4px; padding: 9px 16px; cursor: pointer; }
 .status { font-size: 13px; color: var(--muted); }
+.fixed { font: 500 16px var(--font-mono); color: var(--accent); text-align: center; padding: 9px 0; border: 1px solid var(--line); border-radius: 4px; background: var(--accent-soft); }
 @media (prefers-reduced-motion: reduce) { .bar .fill { transition: none; } }
 </style>
 </head>
@@ -139,12 +140,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       </div>
     </div>
     <div class="q">
-      <span class="lbl" id="gainLbl">Temps économisé avec Noé</span>
-      <div class="seg" id="gainSeg" role="group" aria-labelledby="gainLbl">
-        <button type="button" data-gain="60">60 %</button>
-        <button type="button" data-gain="70" aria-pressed="true">70 %</button>
-        <button type="button" data-gain="80">80 %</button>
-      </div>
+      <span class="lbl">Temps économisé avec Noé</span>
+      <div class="fixed">60 %</div>
     </div>
     <div class="q" id="costQ">
       <span class="lbl" id="costLbl">Salaire brut chargé<small>Coût annuel d'un salarié pour l'employeur.</small></span>
@@ -196,10 +193,10 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 (function () {
   "use strict";
   var WORK_DAYS = 218, HOURS_PER_DAY = 7;
-  var gain = 70, cost = 80000, weeks = 6, cers = 4, view = "temps";
+  var gain = 60, cost = 80000, weeks = 6, cers = 4, view = "temps";
   var LEDE = {
-    temps: "Pour les experts métier : trois questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos rapports d'évaluation clinique.",
-    argent: "Pour les décideurs : quatre questions pour estimer le temps et le budget que Noé libère sur vos rapports d'évaluation clinique."
+    temps: "Pour les experts métier : deux questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos rapports d'évaluation clinique.",
+    argent: "Pour les décideurs : trois questions pour estimer le temps et le budget que Noé libère sur vos rapports d'évaluation clinique."
   };
   var $ = function (id) { return document.getElementById(id); };
   var nf0 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
@@ -262,7 +259,6 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       });
     });
   }
-  choice("gainSeg", function (b) { gain = +b.dataset.gain; });
   choice("cersSeg", function (b) { cers = +b.dataset.cers; });
   choice("weeksSeg", function (b) { weeks = +b.dataset.weeks; });
   choice("costSeg", function (b) { cost = +b.dataset.cost; });
