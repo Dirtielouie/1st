@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculateur ROI Noé</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout : bandeau éditorial, puis deux colonnes — hypothèses à gauche (sticky), résultats à droite ; une colonne sur mobile. */
+:root {
+  --paper: #F4F6F5;
+  --surface: #FFFFFF;
+  --ink: #14212A;
+  --muted: #5A6872;
+  --line: #D9DFDE;
+  --accent: #0D5C63;
+  --accent-soft: #DCECEC;
+  --before: #B9C3C6;
+  --gain: #1F7A4D;
+  --loss: #B23A2E;
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E1418; --surface: #151D22; --ink: #E4EBED; --muted: #93A2AA; --line: #26333A;
+    --accent: #5BB8B3; --accent-soft: #17312F; --before: #3A4950; --gain: #5CCB8A; --loss: #F08A7E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E1418; --surface: #151D22; --ink: #E4EBED; --muted: #93A2AA; --line: #26333A;
+  --accent: #5BB8B3; --accent-soft: #17312F; --before: #3A4950; --gain: #5CCB8A; --loss: #F08A7E;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/1.5 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 48px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 28px; }
+
+header { display: grid; gap: 10px; max-width: 760px; }
+.eyebrow { font: 500 12px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 500 clamp(32px, 5vw, 48px)/1.05 var(--font-display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 em { font-style: italic; color: var(--accent); }
+.lede { margin: 0; color: var(--muted); max-width: 64ch; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
+.presets span { font-size: 13px; color: var(--muted); margin-right: 4px; }
+.chip {
+  font: 500 13px var(--font-body); color: var(--ink); background: transparent;
+  border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer;
+}
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.chip:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 880px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Hypothèses */
+form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 20px 20px; position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); max-height: calc(100vh - 32px); overflow-y: auto; }
+@media (max-width: 880px) { form { position: static; max-height: none; } }
+fieldset { border: 0; margin: 0; padding: 18px 0 4px; display: grid; gap: 12px; border-top: 1px solid var(--line); }
+fieldset:first-of-type { border-top: 0; }
+legend { font: 500 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0; margin-bottom: 4px; float: left; width: 100%; }
+legend + * { clear: both; }
+.field { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 4px 12px; align-items: center; }
+.field label { font-size: 14px; }
+.field small { grid-column: 1 / -1; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.input { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); }
+.input:focus-within { border-color: var(--accent); }
+.input input { width: 100%; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 500 14px var(--font-mono); padding: 7px 8px; text-align: right; font-variant-numeric: tabular-nums; }
+.input input:focus-visible { outline: none; }
+.input i { font: 12px var(--font-mono); font-style: normal; color: var(--muted); padding-right: 8px; white-space: nowrap; }
+.range { display: grid; grid-template-columns: minmax(0, 1fr) 52px; gap: 2px 12px; align-items: center; }
+.range label { font-size: 14px; grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 8px; }
+.range output { font: 500 14px var(--font-mono); color: var(--accent); text-align: right; }
+.range input { width: 100%; accent-color: var(--accent); grid-column: 1 / -1; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+.check input { margin-top: 3px; accent-color: var(--accent); }
+.check small { display: block; color: var(--muted); font-size: 12px; }
+.note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+
+/* Résultats */
+.results { display: grid; gap: 28px; min-width: 0; }
+.results > * { min-width: 0; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+@media (max-width: 1080px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .kpis { grid-template-columns: minmax(0, 1fr); } }
+.kpi { background: var(--surface); padding: 16px 18px; display: grid; gap: 4px; align-content: start; }
+.kpi .k { font: 500 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.kpi .v { font: 500 clamp(26px, 3.2vw, 34px)/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.kpi .s { font-size: 12.5px; color: var(--muted); }
+.kpi.lead { background: var(--accent-soft); }
+.kpi.lead .v { color: var(--accent); }
+.pos { color: var(--gain); }
+.neg { color: var(--loss); }
+
+section h2 { font: 500 22px/1.2 var(--font-display); margin: 0 0 4px; text-wrap: balance; }
+section .sub { margin: 0 0 14px; color: var(--muted); font-size: 14px; max-width: 70ch; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; }
+
+/* Flux type PRISMA */
+.flow { display: grid; gap: 0; }
+.stage { display: grid; grid-template-columns: 30px minmax(0, 220px) minmax(0, 1fr); gap: 4px 14px; padding: 14px 0; border-top: 1px dashed var(--line); }
+.stage:first-child { border-top: 0; padding-top: 4px; }
+.stage .n { font: 500 12px var(--font-mono); color: var(--accent); width: 26px; height: 26px; border: 1px solid var(--accent); border-radius: 50%; display: grid; place-items: center; }
+.stage .name { font-weight: 600; font-size: 14px; }
+.stage .meta { font: 12px var(--font-mono); color: var(--muted); }
+.bars { display: grid; gap: 5px; min-width: 0; }
+.bar { display: grid; grid-template-columns: 52px minmax(0, 1fr) 70px; gap: 8px; align-items: center; font: 12px var(--font-mono); color: var(--muted); }
+.bar .track { height: 12px; background: transparent; position: relative; }
+.bar .fill { height: 100%; border-radius: 2px; background: var(--before); transition: width .35s ease; }
+.bar.after .fill { background: var(--accent); }
+.bar b { font-weight: 500; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+.stage.total .name { font-family: var(--font-display); font-size: 17px; font-weight: 500; }
+@media (max-width: 560px) {
+  .stage { grid-template-columns: 30px minmax(0, 1fr); }
+  .bars { grid-column: 1 / -1; }
+}
+.legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin-top: 6px; flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; background: var(--before); }
+.legend span.a::before { background: var(--accent); }
+
+.cal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 560px) { .cal { grid-template-columns: minmax(0, 1fr); } }
+.cal div { display: grid; gap: 2px; }
+.cal .k { font: 500 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.cal .v { font: 500 26px/1.15 var(--font-display); font-variant-numeric: tabular-nums; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; min-width: 520px; }
+th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--line); font-size: 14px; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font: 500 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+tbody td { font-family: var(--font-mono); font-size: 13.5px; }
+tbody td:first-child { font-family: var(--font-body); font-size: 14px; }
+tfoot td { font-weight: 600; border-bottom: 0; font-family: var(--font-mono); font-size: 13.5px; }
+tfoot td:first-child { font-family: var(--font-body); }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { font: 500 14px var(--font-body); background: var(--accent); color: var(--surface); border: 0; border-radius: 4px; padding: 9px 16px; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.status { font-size: 13px; color: var(--muted); }
+#summary { width: 100%; min-height: 160px; font: 12.5px/1.5 var(--font-mono); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 10px; margin-top: 10px; }
+
+.method { font-size: 13px; color: var(--muted); max-width: 78ch; display: grid; gap: 8px; }
+.method p { margin: 0; }
+.method strong { color: var(--ink); font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) { .bar .fill { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Noé · Revue de littérature clinique · MDR 2017/745</div>
+    <h1>Calculateur de <em>ROI</em> Noé</h1>
+    <p class="lede">Estimez le temps et le budget libérés par Noé sur la revue de littérature de vos rapports d'évaluation clinique (REC / CER) : recherche, sélection des références, évaluation des textes intégraux et rédaction de l'analyse.</p>
+    <div class="presets" role="group" aria-label="Profils types">
+      <span>Profil type :</span>
+      <button type="button" class="chip" data-preset="pme">PME mono-gamme</button>
+      <button type="button" class="chip" data-preset="eti" aria-pressed="true">ETI multi-gammes</button>
+      <button type="button" class="chip" data-preset="groupe">Grand groupe</button>
+      <button type="button" class="chip" data-preset="conseil">Cabinet de conseil</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <form id="f" autocomplete="off" novalidate>
+      <fieldset>
+        <legend>Volume annuel</legend>
+        <div class="field">
+          <label for="cers">REC rédigés ou mis à jour par an</label>
+          <div class="input"><input id="cers" type="number" min="0" step="1"><i>REC</i></div>
+          <small>Nouveaux REC et mises à jour (annuelles pour classe III et implantables).</small>
+        </div>
+        <div class="field">
+          <label for="rate">Coût horaire chargé</label>
+          <div class="input"><input id="rate" type="number" min="0" step="5"><i>€/h</i></div>
+          <small>Coût interne chargé, ou taux journalier du consultant ÷ 7.</small>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Temps actuel par REC</legend>
+        <div class="field">
+          <label for="hProto">Protocole et stratégie de recherche</label>
+          <div class="input"><input id="hProto" type="number" min="0" step="1"><i>h</i></div>
+        </div>
+        <div class="field">
+          <label for="nAbs">Références à trier (titre / résumé)</label>
+          <div class="input"><input id="nAbs" type="number" min="0" step="50"><i>réf.</i></div>
+        </div>
+        <div class="field">
+          <label for="tAbs">Temps par résumé</label>
+          <div class="input"><input id="tAbs" type="number" min="0" step="0.1"><i>min</i></div>
+        </div>
+        <label class="check"><input id="dbl" type="checkbox">
+          <span>Double sélection par deux relecteurs<small>Double le temps de tri titre / résumé.</small></span>
+        </label>
+        <div class="field">
+          <label for="nFt">Textes intégraux évalués</label>
+          <div class="input"><input id="nFt" type="number" min="0" step="5"><i>art.</i></div>
+        </div>
+        <div class="field">
+          <label for="tFt">Temps par texte intégral</label>
+          <div class="input"><input id="tFt" type="number" min="0" step="5"><i>min</i></div>
+          <small>Évaluation de la pertinence et de la contribution, extraction des données.</small>
+        </div>
+        <div class="field">
+          <label for="hWrite">Rédaction de l'analyse de littérature</label>
+          <div class="input"><input id="hWrite" type="number" min="0" step="1"><i>h</i></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Gain de temps avec Noé</legend>
+        <div class="range">
+          <label for="rProto">Protocole et recherche <output id="o_rProto" for="rProto"></output></label>
+          <input id="rProto" type="range" min="0" max="90" step="5">
+        </div>
+        <div class="range">
+          <label for="rAbs">Tri titre / résumé <output id="o_rAbs" for="rAbs"></output></label>
+          <input id="rAbs" type="range" min="0" max="90" step="5">
+        </div>
+        <div class="range">
+          <label for="rFt">Évaluation et extraction <output id="o_rFt" for="rFt"></output></label>
+          <input id="rFt" type="range" min="0" max="90" step="5">
+        </div>
+        <div class="range">
+          <label for="rWrite">Rédaction <output id="o_rWrite" for="rWrite"></output></label>
+          <input id="rWrite" type="range" min="0" max="90" step="5">
+        </div>
+        <p class="note">Valeurs par défaut indicatives. Remplacez-les par les gains mesurés lors de votre pilote Noé.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Investissement Noé</legend>
+        <div class="field">
+          <label for="license">Abonnement annuel</label>
+          <div class="input"><input id="license" type="number" min="0" step="1000"><i>€/an</i></div>
+        </div>
+        <div class="field">
+          <label for="setup">Mise en place et formation</label>
+          <div class="input"><input id="setup" type="number" min="0" step="500"><i>€</i></div>
+          <small>Coût ponctuel, imputé à l'année 1.</small>
+        </div>
+        <div class="field">
+          <label for="adopt">Taux d'adoption en année 1</label>
+          <div class="input"><input id="adopt" type="number" min="0" max="100" step="5"><i>%</i></div>
+          <small>Part des REC traités avec Noé pendant la montée en charge. 100 % ensuite.</small>
+        </div>
+        <div class="field">
+          <label for="weekHours">Temps hebdo de l'équipe sur un REC</label>
+          <div class="input"><input id="weekHours" type="number" min="1" step="1"><i>h/sem</i></div>
+          <small>Sert à convertir les heures en délai calendaire.</small>
+        </div>
+      </fieldset>
+    </form>
+
+    <div class="results" aria-live="polite">
+      <div class="kpis">
+        <div class="kpi lead"><span class="k">ROI sur 3 ans</span><span class="v" id="k_roi3"></span><span class="s" id="k_roi1"></span></div>
+        <div class="kpi"><span class="k">Gain net sur 3 ans</span><span class="v" id="k_net3"></span><span class="s" id="k_net1"></span></div>
+        <div class="kpi"><span class="k">Retour sur investissement</span><span class="v" id="k_payback"></span><span class="s">Mois avant que les gains couvrent l'abonnement et la mise en place</span></div>
+        <div class="kpi"><span class="k">Heures libérées par an</span><span class="v" id="k_hours"></span><span class="s" id="k_fte"></span></div>
+      </div>
+
+      <section>
+        <h2>Temps passé sur un REC, étape par étape</h2>
+        <p class="sub" id="flowSub"></p>
+        <div class="panel">
+          <div class="flow" id="flow"></div>
+          <div class="legend"><span>Processus actuel</span><span class="a">Avec Noé</span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Délai de production d'un REC</h2>
+        <p class="sub">À effort hebdomadaire constant, le temps gagné raccourcit la mise à disposition du REC pour l'organisme notifié.</p>
+        <div class="panel cal">
+          <div><span class="k">Aujourd'hui</span><span class="v" id="c_before"></span></div>
+          <div><span class="k">Avec Noé</span><span class="v" id="c_after"></span></div>
+          <div><span class="k">Gagné par REC</span><span class="v pos" id="c_gain"></span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Projection sur 3 ans</h2>
+        <p class="sub">Gains = heures économisées × coût horaire. Le coût de mise en place est imputé à l'année 1.</p>
+        <div class="panel table-wrap">
+          <table>
+            <thead><tr><th>Année</th><th>Heures économisées</th><th>Gains</th><th>Coût Noé</th><th>Gain net</th><th>Cumul</th></tr></thead>
+            <tbody id="years"></tbody>
+            <tfoot id="yearsTotal"></tfoot>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>Partager le résultat</h2>
+        <p class="sub">Un résumé texte prêt à coller dans un e-mail ou une note de business case.</p>
+        <div class="actions">
+          <button type="button" class="btn" id="copy">Copier le résumé</button>
+          <button type="button" class="btn ghost" id="reset">Revenir au profil type</button>
+          <span class="status" id="status" role="status"></span>
+        </div>
+        <textarea id="summary" readonly aria-label="Résumé du calcul"></textarea>
+      </section>
+
+      <section class="method">
+        <h2>Méthode</h2>
+        <p><strong>Temps actuel par REC</strong> = protocole + (références × temps par résumé × relecteurs) + (textes intégraux × temps par texte) + rédaction.</p>
+        <p><strong>Temps avec Noé</strong> = chaque étape × (1 − gain de l'étape). Les heures libérées sont valorisées au coût horaire chargé. Un ETP compte 1 607 h par an.</p>
+        <p><strong>ROI</strong> = (gains − coûts Noé) ÷ coûts Noé. Les profils types et les gains par défaut sont des hypothèses d'illustration, pas des mesures de performance : ajustez-les avec vos propres données.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var PRESETS = {
+    pme:     { cers: 6,  rate: 70,  hProto: 12, nAbs: 800,  tAbs: 1.5, dbl: false, nFt: 60,  tFt: 45, hWrite: 32, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 15000, setup: 3000,  adopt: 80, weekHours: 20 },
+    eti:     { cers: 20, rate: 80,  hProto: 16, nAbs: 1500, tAbs: 1.5, dbl: false, nFt: 120, tFt: 45, hWrite: 40, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 30000, setup: 5000,  adopt: 80, weekHours: 25 },
+    groupe:  { cers: 60, rate: 90,  hProto: 20, nAbs: 2500, tAbs: 1.5, dbl: true,  nFt: 200, tFt: 50, hWrite: 48, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 75000, setup: 12000, adopt: 70, weekHours: 30 },
+    conseil: { cers: 40, rate: 110, hProto: 14, nAbs: 1500, tAbs: 1.2, dbl: false, nFt: 120, tFt: 40, hWrite: 36, rProto: 30, rAbs: 70, rFt: 50, rWrite: 35, license: 45000, setup: 6000,  adopt: 80, weekHours: 35 }
+  };
+  var KEYS = Object.keys(PRESETS.eti);
+  var FTE_HOURS = 1607;
+  var STORE = "noe-roi-v1";
+  var preset = "eti", basePreset = "eti";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var nf0 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
+  var nf1 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
+  var eur = function (v) { return nf0.format(Math.round(v)) + " €"; };
+  var eurK = function (v) {
+    var a = Math.abs(v);
+    if (a >= 1e6) return nf1.format(v / 1e6) + " M€";
+    if (a >= 1e4) return nf0.format(v / 1e3) + " k€";
+    return eur(v);
+  };
+  var h = function (v) { return nf0.format(Math.round(v)) + " h"; };
+  var pct = function (v) { return nf0.format(Math.round(v)) + " %"; };
+  var signed = function (v, fmt) { return (v > 0 ? "+" : v < 0 ? "−" : "") + fmt(Math.abs(v)); };
+
+  function setValues(v) {
+    KEYS.forEach(function (k) {
+      var el = $(k);
+      if (el.type === "checkbox") el.checked = !!v[k]; else el.value = v[k];
+    });
+  }
+  function readValues() {
+    var v = {};
+    KEYS.forEach(function (k) {
+      var el = $(k);
+      if (el.type === "checkbox") { v[k] = el.checked; return; }
+      var n = parseFloat(el.value);
+      v[k] = isFinite(n) && n >= 0 ? n : 0;
+    });
+    v.adopt = Math.min(v.adopt, 100);
+    v.weekHours = Math.max(v.weekHours, 1);
+    return v;
+  }
+
+  function compute(v) {
+    var stages = [
+      { name: "Protocole et stratégie de recherche", meta: "Bases, équations, critères PICO", before: v.hProto, r: v.rProto },
+      { name: "Tri titre / résumé", meta: nf0.format(v.nAbs) + " réf. × " + nf1.format(v.tAbs) + " min" + (v.dbl ? " × 2 relecteurs" : ""), before: v.nAbs * v.tAbs * (v.dbl ? 2 : 1) / 60, r: v.rAbs },
+      { name: "Évaluation et extraction", meta: nf0.format(v.nFt) + " textes intégraux × " + nf0.format(v.tFt) + " min", before: v.nFt * v.tFt / 60, r: v.rFt },
+      { name: "Rédaction de l'analyse", meta: "Synthèse des données cliniques", before: v.hWrite, r: v.rWrite }
+    ];
+    var before = 0, after = 0;
+    stages.forEach(function (s) { s.after = s.before * (1 - s.r / 100); before += s.before; after += s.after; });
+    var savedPerCer = before - after;
+    var hoursYear = savedPerCer * v.cers;
+    var grossFull = hoursYear * v.rate;
+    var years = [1, 2, 3].map(function (y) {
+      var adopt = y === 1 ? v.adopt / 100 : 1;
+      var hours = hoursYear * adopt;
+      var gross = hours * v.rate;
+      var cost = v.license + (y === 1 ? v.setup : 0);
+      return { y: y, hours: hours, gross: gross, cost: cost, net: gross - cost };
+    });
+    var cum = 0;
+    years.forEach(function (r) { cum += r.net; r.cum = cum; });
+    var cost1 = years[0].cost, cost3 = years.reduce(function (a, r) { return a + r.cost; }, 0);
+    var gross3 = years.reduce(function (a, r) { return a + r.gross; }, 0);
+
+    // Retour sur investissement : mois où les gains cumulés couvrent la mise en place + l'abonnement payé d'avance.
+    var payback = null, cumGross = 0;
+    for (var m = 1; m <= 36; m++) {
+      cumGross += hoursYear * (m <= 12 ? v.adopt / 100 : 1) * v.rate / 12;
+      if (cumGross >= v.setup + v.license * Math.ceil(m / 12)) { payback = m; break; }
+    }
+    return {
+      stages: stages, before: before, after: after, savedPerCer: savedPerCer,
+      hoursYear: hoursYear, grossFull: grossFull, years: years,
+      net1: years[0].net, net3: cum, cost1: cost1, cost3: cost3, gross3: gross3,
+      roi1: cost1 > 0 ? years[0].net / cost1 * 100 : null,
+      roi3: cost3 > 0 ? cum / cost3 * 100 : null,
+      payback: payback
+    };
+  }
+
+  function weeks(hours, perWeek) { return hours / perWeek; }
+  function fmtWeeks(w) { return nf1.format(w) + " sem."; }
+
+  function render() {
+    var v = readValues();
+    var r = compute(v);
+    ["rProto", "rAbs", "rFt", "rWrite"].forEach(function (k) { $("o_" + k).textContent = "−" + v[k] + " %"; });
+
+    var roi3 = $("k_roi3");
+    roi3.textContent = r.roi3 === null ? "—" : signed(r.roi3, pct);
+    roi3.className = "v";
+    $("k_roi1").textContent = r.roi1 === null ? "Saisissez un coût Noé" : "Année 1 : " + signed(r.roi1, pct);
+    var net3 = $("k_net3");
+    net3.textContent = signed(r.net3, eurK);
+    net3.className = "v " + (r.net3 >= 0 ? "pos" : "neg");
+    $("k_net1").textContent = "Année 1 : " + signed(r.net1, eurK);
+    $("k_payback").textContent = r.payback === null ? "> 36 mois" : r.payback + " mois";
+    $("k_hours").textContent = h(r.hoursYear);
+    $("k_fte").textContent = nf1.format(r.hoursYear / FTE_HOURS) + " ETP libérés en régime de croisière";
+
+    $("flowSub").textContent = "Par REC : " + h(r.before) + " aujourd'hui, " + h(r.after) + " avec Noé, soit " + h(r.savedPerCer) + " économisées (" + pct(r.before ? r.savedPerCer / r.before * 100 : 0) + ").";
+    var max = Math.max.apply(null, r.stages.map(function (s) { return s.before; }).concat([1]));
+    var html = r.stages.map(function (s, i) {
+      return '<div class="stage"><span class="n">' + (i + 1) + '</span>' +
+        '<div><div class="name">' + s.name + '</div><div class="meta">' + s.meta + '</div></div>' +
+        '<div class="bars">' +
+          '<div class="bar"><span>Avant</span><div class="track"><div class="fill" style="width:' + (s.before / max * 100) + '%"></div></div><b>' + h(s.before) + '</b></div>' +
+          '<div class="bar after"><span>Noé</span><div class="track"><div class="fill" style="width:' + (s.after / max * 100) + '%"></div></div><b>' + h(s.after) + '</b></div>' +
+        '</div></div>';
+    }).join("");
+    html += '<div class="stage total"><span></span><div><div class="name">Total par REC</div><div class="meta">' + signed(-r.savedPerCer, h) + '</div></div>' +
+      '<div class="bars">' +
+        '<div class="bar"><span>Avant</span><div class="track"></div><b>' + h(r.before) + '</b></div>' +
+        '<div class="bar after"><span>Noé</span><div class="track"></div><b>' + h(r.after) + '</b></div>' +
+      '</div></div>';
+    $("flow").innerHTML = html;
+
+    var wb = weeks(r.before, v.weekHours), wa = weeks(r.after, v.weekHours);
+    $("c_before").textContent = fmtWeeks(wb);
+    $("c_after").textContent = fmtWeeks(wa);
+    $("c_gain").textContent = "−" + fmtWeeks(wb - wa);
+
+    $("years").innerHTML = r.years.map(function (y) {
+      return "<tr><td>Année " + y.y + (y.y === 1 ? " · adoption " + nf0.format(v.adopt) + " %" : "") + "</td><td>" + h(y.hours) + "</td><td>" + eur(y.gross) +
+        "</td><td>" + eur(y.cost) + '</td><td class="' + (y.net >= 0 ? "pos" : "neg") + '">' + signed(y.net, eur) +
+        '</td><td class="' + (y.cum >= 0 ? "pos" : "neg") + '">' + signed(y.cum, eur) + "</td></tr>";
+    }).join("");
+    $("yearsTotal").innerHTML = "<tr><td>Total 3 ans</td><td>" + h(r.years.reduce(function (a, y) { return a + y.hours; }, 0)) + "</td><td>" + eur(r.gross3) +
+      "</td><td>" + eur(r.cost3) + '</td><td class="' + (r.net3 >= 0 ? "pos" : "neg") + '">' + signed(r.net3, eur) + "</td><td></td></tr>";
+
+    $("summary").value = [
+      "ROI de Noé pour la revue de littérature des REC (MDR 2017/745)",
+      "",
+      "Hypothèses : " + nf0.format(v.cers) + " REC/an, " + nf0.format(v.nAbs) + " références triées et " + nf0.format(v.nFt) + " textes intégraux évalués par REC, coût horaire " + eur(v.rate) + ".",
+      "Gains Noé retenus : protocole −" + v.rProto + " %, tri −" + v.rAbs + " %, évaluation/extraction −" + v.rFt + " %, rédaction −" + v.rWrite + " %.",
+      "",
+      "• Temps par REC : " + h(r.before) + " → " + h(r.after) + " (" + signed(-r.savedPerCer, h) + ")",
+      "• Délai par REC : " + fmtWeeks(wb) + " → " + fmtWeeks(wa),
+      "• Heures libérées : " + h(r.hoursYear) + "/an, soit " + nf1.format(r.hoursYear / FTE_HOURS) + " ETP",
+      "• Coût Noé sur 3 ans : " + eur(r.cost3) + " (abonnement " + eur(v.license) + "/an + mise en place " + eur(v.setup) + ")",
+      "• Gain net sur 3 ans : " + signed(r.net3, eur) + " (année 1 : " + signed(r.net1, eur) + ")",
+      "• ROI sur 3 ans : " + (r.roi3 === null ? "—" : signed(r.roi3, pct)) + " · retour sur investissement : " + (r.payback === null ? "> 36 mois" : r.payback + " mois"),
+      "",
+      "Estimation indicative fondée sur les hypothèses ci-dessus."
+    ].join("\n");
+
+    try { localStorage.setItem(STORE, JSON.stringify({ preset: preset, base: basePreset, v: v })); } catch (e) {}
+  }
+
+  function markPreset(name) {
+    preset = name;
+    if (name) basePreset = name;
+    document.querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", String(c.dataset.preset === name)); });
+  }
+
+  document.querySelectorAll(".chip").forEach(function (c) {
+    c.addEventListener("click", function () { markPreset(c.dataset.preset); setValues(PRESETS[c.dataset.preset]); render(); });
+  });
+  $("f").addEventListener("input", function () { markPreset(null); render(); });
+  $("f").addEventListener("submit", function (e) { e.preventDefault(); });
+  $("reset").addEventListener("click", function () {
+    var name = basePreset; markPreset(name); setValues(PRESETS[name]); render();
+    $("status").textContent = "Valeurs du profil type rétablies.";
+  });
+  $("copy").addEventListener("click", function () {
+    var ta = $("summary"), st = $("status");
+    var fallback = function () { ta.focus(); ta.select(); st.textContent = "Texte sélectionné : copiez-le avec Ctrl+C ou ⌘C."; };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(function () { st.textContent = "Résumé copié."; }, fallback);
+    } else fallback();
+  });
+
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem(STORE) || "null"); } catch (e) {}
+  if (saved && saved.v) { setValues(Object.assign({}, PRESETS.eti, saved.v)); if (PRESETS[saved.base]) basePreset = saved.base; markPreset(saved.preset && PRESETS[saved.preset] ? saved.preset : null); }
+  else { setValues(PRESETS.eti); markPreset("eti"); }
+  render();
+})();
+</script>
+</body>
+</html>
