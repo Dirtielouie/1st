@@ -36,6 +36,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
   font: 15px/1.5 var(--font-body);
@@ -67,6 +68,11 @@ h1 em { color: var(--accent); }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.tabs button { font: 600 15px var(--font-body); text-align: left; background: var(--surface); color: var(--muted); border: 0; padding: 14px 18px; cursor: pointer; box-shadow: inset 0 -3px 0 transparent; }
+.tabs button small { display: block; font: 400 13px var(--font-body); }
+.tabs button[aria-selected="true"] { color: var(--ink); box-shadow: inset 0 -3px 0 var(--accent); }
+.tabs button[aria-selected="true"] small { color: var(--accent); }
 .result { display: grid; gap: 18px; }
 .big { background: var(--accent-soft); border-radius: 6px; padding: 22px; display: grid; gap: 4px; }
 .big .k { font: 500 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -92,8 +98,13 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <header>
     <div class="eyebrow">Noé · Revue de littérature des CER</div>
     <h1>Combien vous fait gagner <em>Noé</em> ?</h1>
-    <p class="lede">Quatre questions pour estimer le temps et le budget libérés sur vos rapports d'évaluation clinique.</p>
+    <p class="lede" id="lede"></p>
   </header>
+
+  <div class="tabs" role="tablist" aria-label="Type de calcul">
+    <button type="button" role="tab" id="tab-temps" data-view="temps" aria-controls="f">Gain de temps<small>Pour les experts métier</small></button>
+    <button type="button" role="tab" id="tab-argent" data-view="argent" aria-controls="f">Temps et argent<small>Pour les décideurs</small></button>
+  </div>
 
   <form class="card" id="f" autocomplete="off" novalidate>
     <div class="q">
@@ -121,7 +132,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <button type="button" data-gain="80">80 %</button>
       </div>
     </div>
-    <div class="q">
+    <div class="q" id="costQ">
       <span class="lbl" id="costLbl">Salaire brut chargé<small>Coût annuel d'un salarié pour l'employeur.</small></span>
       <div class="seg" id="costSeg" role="group" aria-labelledby="costLbl">
         <button type="button" data-cost="50000">50 k€</button>
@@ -135,13 +146,19 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   </form>
 
   <div class="result" aria-live="polite">
-    <div class="big">
+    <div class="big" data-for="argent">
       <span class="k">Économies par an</span>
       <span class="v" id="r_eur"></span>
       <span class="s" id="r_eur_s"></span>
     </div>
+    <div class="big" data-for="temps">
+      <span class="k">Temps libéré par an</span>
+      <span class="v" id="r_weeks"></span>
+      <span class="s" id="r_weeks_s"></span>
+    </div>
     <div class="tiles">
-      <div class="tile"><span class="k">Jours libérés par an</span><span class="v" id="r_days"></span></div>
+      <div class="tile" data-for="temps"><span class="k">CER en plus à effort égal</span><span class="v" id="r_more"></span></div>
+      <div class="tile" data-for="argent"><span class="k">Semaines libérées par an</span><span class="v" id="r_weeks2"></span></div>
       <div class="tile"><span class="k">Équivalent temps plein</span><span class="v" id="r_fte"></span></div>
     </div>
     <div class="card compare">
@@ -149,7 +166,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <div class="bar"><span>Aujourd'hui</span><div><div class="fill" id="b_before"></div></div><b id="r_before"></b></div>
       <div class="bar after"><span>Avec Noé</span><div><div class="fill" id="b_after"></div></div><b id="r_after"></b></div>
     </div>
-    <p class="note">Calcul : CER par an × durée d'un CER (1 semaine = 5 jours) × % économisé = jours libérés. Un salarié travaille 218 jours par an, donc 1 jour = salaire brut chargé ÷ 218.</p>
+    <p class="note">Calcul : CER par an × durée d'un CER (1 semaine = 5 jours) × % économisé = jours libérés. Un salarié travaille 218 jours par an<span data-for="argent">, donc 1 jour = salaire brut chargé ÷ 218</span>.</p>
   </div>
 </div>
 
@@ -157,7 +174,11 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 (function () {
   "use strict";
   var WORK_DAYS = 218;
-  var gain = 70, cost = 80000, weeks = 6;
+  var gain = 70, cost = 80000, weeks = 6, view = "temps";
+  var LEDE = {
+    temps: "Trois questions pour mesurer le temps que Noé vous rend sur la revue de littérature de vos rapports d'évaluation clinique.",
+    argent: "Quatre questions pour estimer le temps et le budget que Noé libère sur vos rapports d'évaluation clinique."
+  };
   var $ = function (id) { return document.getElementById(id); };
   var nf0 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
   var nf1 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
@@ -170,7 +191,10 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     var eur = saved * cost / WORK_DAYS;
     $("r_eur").textContent = nf0.format(Math.round(eur)) + " €";
     $("r_eur_s").textContent = "soit " + nf0.format(Math.round(eur * 3)) + " € sur 3 ans";
-    $("r_days").textContent = nf0.format(Math.round(saved)) + " j";
+    $("r_weeks").textContent = nf1.format(saved / 5) + " sem.";
+    $("r_weeks_s").textContent = "soit " + nf0.format(Math.round(saved)) + " jours de travail";
+    $("r_weeks2").textContent = nf1.format(saved / 5) + " sem.";
+    $("r_more").textContent = after > 0 ? "+" + nf0.format(Math.floor(cers * days / after - cers)) : "—";
     $("r_fte").textContent = nf1.format(saved / WORK_DAYS) + " ETP";
     $("r_before").textContent = nf1.format(weeks) + " sem.";
     $("r_after").textContent = nf1.format(after / 5) + " sem.";
@@ -190,6 +214,19 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   choice("gainSeg", function (b) { gain = +b.dataset.gain; });
   choice("weeksSeg", function (b) { weeks = +b.dataset.weeks; });
   choice("costSeg", function (b) { cost = +b.dataset.cost; });
+
+  function setView(v) {
+    view = v;
+    document.querySelectorAll(".tabs button").forEach(function (t) { t.setAttribute("aria-selected", String(t.dataset.view === v)); });
+    document.querySelectorAll("[data-for]").forEach(function (el) { el.hidden = el.dataset.for !== v; });
+    $("costQ").hidden = v !== "argent";
+    $("lede").textContent = LEDE[v];
+    try { history.replaceState(null, "", "#" + v); } catch (e) {}
+  }
+  document.querySelectorAll(".tabs button").forEach(function (t) {
+    t.addEventListener("click", function () { setView(t.dataset.view); });
+  });
+  setView(location.hash === "#argent" ? "argent" : "temps");
   $("f").addEventListener("input", render);
   $("f").addEventListener("submit", function (e) { e.preventDefault(); });
   render();
