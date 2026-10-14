@@ -61,10 +61,9 @@ h1 em { color: var(--accent); }
 .input input { width: 100%; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 500 16px var(--font-mono); padding: 9px 10px; text-align: right; font-variant-numeric: tabular-nums; }
 .input input:focus-visible { outline: none; }
 .input i { font: 13px var(--font-mono); font-style: normal; color: var(--muted); padding-right: 10px; white-space: nowrap; }
-.seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
-.seg button { font: 500 15px var(--font-mono); background: var(--paper); color: var(--ink); border: 0; border-left: 1px solid var(--line); padding: 9px 0; cursor: pointer; }
-.seg button:nth-child(3n+1) { border-left: 0; }
-.seg button:nth-child(n+4) { border-top: 1px solid var(--line); }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.seg.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.seg button { font: 500 15px var(--font-mono); background: var(--paper); color: var(--ink); border: 0; padding: 9px 0; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
@@ -102,8 +101,17 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <div class="input"><input id="cers" type="number" min="0" step="1" value="10"><i>CER</i></div>
     </div>
     <div class="q">
-      <label for="days">Durée d'un CER<small>Temps de travail passé sur un CER aujourd'hui.</small></label>
-      <div class="input"><input id="days" type="number" min="0" step="1" value="30"><i>jours</i></div>
+      <span class="lbl" id="weeksLbl">Durée d'un CER<small>Temps de travail passé sur un CER aujourd'hui, en semaines.</small></span>
+      <div class="seg cols-4" id="weeksSeg" role="group" aria-labelledby="weeksLbl">
+        <button type="button" data-weeks="1">1</button>
+        <button type="button" data-weeks="2">2</button>
+        <button type="button" data-weeks="3">3</button>
+        <button type="button" data-weeks="4">4</button>
+        <button type="button" data-weeks="5">5</button>
+        <button type="button" data-weeks="6" aria-pressed="true">6</button>
+        <button type="button" data-weeks="7">7</button>
+        <button type="button" data-weeks="8">8</button>
+      </div>
     </div>
     <div class="q">
       <span class="lbl" id="gainLbl">Temps économisé avec Noé</span>
@@ -141,7 +149,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <div class="bar"><span>Aujourd'hui</span><div><div class="fill" id="b_before"></div></div><b id="r_before"></b></div>
       <div class="bar after"><span>Avec Noé</span><div><div class="fill" id="b_after"></div></div><b id="r_after"></b></div>
     </div>
-    <p class="note">Calcul : CER par an × durée d'un CER × % économisé = jours libérés. Un salarié travaille 218 jours par an, donc 1 jour = salaire brut chargé ÷ 218.</p>
+    <p class="note">Calcul : CER par an × durée d'un CER (1 semaine = 5 jours) × % économisé = jours libérés. Un salarié travaille 218 jours par an, donc 1 jour = salaire brut chargé ÷ 218.</p>
   </div>
 </div>
 
@@ -149,14 +157,14 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 (function () {
   "use strict";
   var WORK_DAYS = 218;
-  var gain = 70, cost = 80000;
+  var gain = 70, cost = 80000, weeks = 6;
   var $ = function (id) { return document.getElementById(id); };
   var nf0 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
   var nf1 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
   var num = function (id) { var n = parseFloat($(id).value); return isFinite(n) && n > 0 ? n : 0; };
 
   function render() {
-    var cers = num("cers"), days = num("days");
+    var cers = num("cers"), days = weeks * 5;
     var after = days * (1 - gain / 100);
     var saved = cers * days * gain / 100;
     var eur = saved * cost / WORK_DAYS;
@@ -164,8 +172,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     $("r_eur_s").textContent = "soit " + nf0.format(Math.round(eur * 3)) + " € sur 3 ans";
     $("r_days").textContent = nf0.format(Math.round(saved)) + " j";
     $("r_fte").textContent = nf1.format(saved / WORK_DAYS) + " ETP";
-    $("r_before").textContent = nf1.format(days) + " j";
-    $("r_after").textContent = nf1.format(after) + " j";
+    $("r_before").textContent = nf1.format(weeks) + " sem.";
+    $("r_after").textContent = nf1.format(after / 5) + " sem.";
     $("b_before").style.width = days > 0 ? "100%" : "0";
     $("b_after").style.width = days > 0 ? (after / days * 100) + "%" : "0";
   }
@@ -180,6 +188,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     });
   }
   choice("gainSeg", function (b) { gain = +b.dataset.gain; });
+  choice("weeksSeg", function (b) { weeks = +b.dataset.weeks; });
   choice("costSeg", function (b) { cost = +b.dataset.cost; });
   $("f").addEventListener("input", render);
   $("f").addEventListener("submit", function (e) { e.preventDefault(); });
