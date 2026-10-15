@@ -70,7 +70,7 @@ input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; bor
     <div class="field"><label for="team">Personnes dans l'équipe</label><div class="box"><input type="number" id="team" value="10" min="0"></div></div>
     <div class="field"><label for="salary">Salaire annuel moyen</label><div class="box"><input type="number" id="salary" value="85000" min="0" step="1000"><span>€</span></div></div>
     <div class="field"><label for="hours">Heures de documentation par semaine et par personne</label><div class="box"><input type="number" id="hours" value="2" min="0" step="0.5"><span>h</span></div></div>
-    <div class="field"><label for="audit">Coûts d'audit et de conformité par an</label><div class="box"><input type="number" id="audit" value="33200" min="0" step="100"><span>€</span></div></div>
+    <div class="field"><label for="auditDays">Jours-personne par an pour préparer les audits et traiter les non-conformités</label><div class="box"><input type="number" id="auditDays" value="35" min="0"><span>j</span></div></div>
   </section>
 
   <section class="card">
@@ -78,7 +78,7 @@ input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; bor
     <div class="field"><label for="license">Licences et hébergement par an</label><div class="box"><input type="number" id="license" value="13500" min="0" step="100"><span>€</span></div></div>
     <div class="field"><label for="setup">Mise en place (une fois)</label><div class="box"><input type="number" id="setup" value="7900" min="0" step="100"><span>€</span></div></div>
     <div class="field"><label for="gain">Temps de documentation gagné</label><div class="box"><input type="number" id="gain" value="35" min="0" max="100"><span>%</span></div></div>
-    <div class="field"><label for="auditGain">Économie sur les audits</label><div class="box"><input type="number" id="auditGain" value="40" min="0" max="100"><span>%</span></div></div>
+    <div class="field"><label for="auditGain">Temps d'audit gagné</label><div class="box"><input type="number" id="auditGain" value="40" min="0" max="100"><span>%</span></div></div>
   </section>
 
   <section class="card result" aria-live="polite">
@@ -94,14 +94,16 @@ input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; bor
 
 <script>
 (() => {
-  const ids = ["team", "salary", "hours", "audit", "license", "setup", "gain", "auditGain"];
+  const ids = ["team", "salary", "hours", "auditDays", "license", "setup", "gain", "auditGain"];
   const v = id => +document.getElementById(id).value || 0;
   const eur = x => new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(x);
 
   function update() {
     // 1 700 h travaillées par an, 52 semaines documentées.
-    const docCost = v("team") * v("hours") * 52 * (v("salary") / 1700);
-    const yearly = docCost * v("gain") / 100 + v("audit") * v("auditGain") / 100;
+    const hourly = v("salary") / 1700;
+    const docCost = v("team") * v("hours") * 52 * hourly;
+    const auditCost = v("auditDays") * 8 * hourly;
+    const yearly = docCost * v("gain") / 100 + auditCost * v("auditGain") / 100;
     const cost3 = v("license") * 3 + v("setup");
     const net = yearly * 3 - cost3;
     const roi = cost3 > 0 ? net / cost3 : 0;
@@ -114,7 +116,7 @@ input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; bor
     document.getElementById("net").textContent = eur(net);
     document.getElementById("payback").textContent = months === null ? "jamais" : `${months} mois`;
     document.getElementById("detail").textContent =
-      `La documentation manuelle coûte ${eur(docCost)} par an. Aligned Elements fait gagner ${eur(yearly)} par an, pour ${eur(v("license"))} de licences par an et ${eur(v("setup"))} de mise en place.`;
+      `La documentation manuelle coûte ${eur(docCost)} par an et la préparation des audits ${eur(auditCost)}. Aligned Elements fait gagner ${eur(yearly)} par an, pour ${eur(v("license"))} de licences par an et ${eur(v("setup"))} de mise en place.`;
   }
 
   ids.forEach(id => document.getElementById(id).addEventListener("input", update));
