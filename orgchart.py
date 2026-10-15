@@ -4,7 +4,10 @@
 l'entreprise).
 
 Usage :
-    python3 orgchart.py data/easymedstat.json output/easymedstat.html "EasyMedStat"
+    python3 orgchart.py data/easymedstat.json output/easymedstat.html "EasyMedStat" [corrections.json]
+
+Le fichier de corrections (optionnel) retire les départs et ajoute les
+personnes absentes de la base : {"remove": ["Nom"], "add": [{"full_name": ..., "title": ...}]}.
 
 La hiérarchie est déduite des intitulés de poste : les liens hiérarchiques
 sont des hypothèses, pas des données LinkedIn.
@@ -120,12 +123,27 @@ footer{{margin-top:28px;color:var(--mute);font-size:12px;text-align:center}}
 </body></html>"""
 
 
+def apply_corrections(people, path):
+    """Applique les corrections manuelles : {"remove": [noms], "add": [personnes]}.
+
+    Une personne ajoutée : {"full_name", "title", "seniority"?, "location"?, "lead_linkedin_url"?}.
+    """
+    fix = json.load(open(path, encoding="utf-8"))
+    removed = {n.lower() for n in fix.get("remove", [])}
+    people = [p for p in people if p.get("full_name", "").lower() not in removed]
+    for p in fix.get("add", []):
+        people.append({**p, "headline": p.get("title", "")})
+    return people
+
+
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) not in (4, 5):
         sys.exit(__doc__)
-    src, out, company = sys.argv[1:]
+    src, out, company = sys.argv[1:4]
     data = json.load(open(src, encoding="utf-8"))
     people = data["results"] if isinstance(data, dict) else data
+    if len(sys.argv) == 5:
+        people = apply_corrections(people, sys.argv[4])
     direction, depts = build(people, company)
     with open(out, "w", encoding="utf-8") as f:
         f.write(render(direction, depts, company, len(people)))
